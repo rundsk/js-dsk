@@ -1,7 +1,8 @@
 name: npm Package
 
 on:
-  push:
+  release:
+    types: [created]
 
 jobs:
   publish-npm:
