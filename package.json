@@ -1,5 +1,5 @@
 {
-  "name": "@atelierdisko/dsk",
+  "name": "@rundsk/js-sdk",
   "version": "1.3.0-alpha",
   "description": "DSK JavaScript SDK",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/atelierdisko/dsk.git"
+    "url": "git+https://github.com/rundsk/js-sdk.git"
   },
   "keywords": [
     "design system",
@@ -20,9 +20,9 @@
   ],
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/atelierdisko/dsk/issues"
+    "url": "https://github.com/rundsk/js-sdk/issues"
   },
-  "homepage": "https://github.com/atelierdisko/dsk/js/dsk",
+  "homepage": "https://github.com/rundsk/js-sdk",
   "devDependencies": {
     "prettier": "^1.18.2"
   }
