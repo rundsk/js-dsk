@@ -1,7 +1,7 @@
 {
   "name": "@atelierdisko/dsk",
   "version": "1.3.0-alpha",
-  "description": "DSK SDK: client and utility classes to connect and work with responses from DSK.",
+  "description": "DSK JavaScript SDK",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
