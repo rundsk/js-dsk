@@ -1,7 +1,7 @@
 # DSK JavaScript SDK
 
 Client and utility classes to connect and work with 
-responses from [DSK](https://github.com/atelierdisko/dsk).
+responses from [DSK](https://rundsk.com).
 
 ## Requirements
 
