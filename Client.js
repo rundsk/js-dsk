@@ -11,17 +11,24 @@
 // The client supports versions, you can select the version on a per
 // API call basis. If a version is not specified, the primary version
 // is being used.
+
+let cancelSearch = null;
+let cancelFilter = null;
+
 export default class Client {
   static hello() {
-    return this.fetch('/api/v2/hello');
+    let [promise] = this.fetch('/api/v2/hello');
+    return promise;
   }
 
   static config() {
-    return this.fetch('/api/v2/config');
+    let [promise] = this.fetch('/api/v2/config');
+    return promise;
   }
 
   static sources() {
-    return this.fetch('/api/v2/sources');
+    let [promise] = this.fetch('/api/v2/sources');
+    return promise;
   }
 
   // Returns a WebSocket connection to the messages endpoint. Asummes it
@@ -40,7 +47,8 @@ export default class Client {
       params.set('v', version);
     }
 
-    return this.fetch(`/api/v2/tree?${params.toString()}`);
+    let [promise] = this.fetch(`/api/v2/tree?${params.toString()}`);
+    return promise;
   }
 
   // Check if a node is present. Returns a promise that resolves to a boolean
@@ -61,7 +69,8 @@ export default class Client {
       params.set('v', version);
     }
 
-    return this.fetch(`/api/v2/tree/${this.nodeURL(url)}?${params.toString()}`);
+    let [promise] = this.fetch(`/api/v2/tree/${this.nodeURL(url)}?${params.toString()}`);
+    return promise;
   }
 
   // Will automatically strip leading and trailing slashes from the given node
@@ -85,7 +94,13 @@ export default class Client {
       params.set('v', version);
     }
 
-    return this.fetch(`/api/v2/search?${params.toString()}`);
+    if (cancelSearch) {
+      cancelSearch();
+    }
+
+    let [promise, cancel] = this.fetch(`/api/v2/search?${params.toString()}`);
+    cancelSearch = cancel;
+    return promise;
   }
 
   // Performs a narrow search against the tree. The returned nodes together
@@ -107,7 +122,14 @@ export default class Client {
       params.set('v', version);
     }
 
-    return this.fetch(`/api/v2/filter?${params.toString()}`);
+    if (cancelFilter) {
+      cancelFilter();
+    }
+
+    let [promise, cancel] = this.fetch(`/api/v2/filter?${params.toString()}`);
+    cancelFilter = cancel;
+
+    return promise;
   }
 
   // Performs HTTP GET requests, returns a promise. Fail promise when there
@@ -115,9 +137,15 @@ export default class Client {
   // indicating an error. Using plain XHR for better browser support and easier
   // basic auth handling.
   static fetch(url, type = 'json') {
-    return new Promise((resolve, reject) => {
+    let cancel;
+    let promise = new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest();
       xhr.responseType = type;
+
+      cancel = () => {
+        reject('Request was cancelled');
+        xhr.abort();
+      };
 
       xhr.addEventListener('readystatechange', () => {
         if (xhr.readyState === 4) {
@@ -148,6 +176,8 @@ export default class Client {
       xhr.setRequestHeader('Accept', type === 'json' ? 'application/json' : '*/*');
       xhr.send();
     });
+
+    return [promise, cancel];
   }
 
   // Performs HTTP HEAD requests, returns a promise that resolves to a
