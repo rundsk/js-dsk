@@ -1,11 +1,8 @@
 {
   "name": "@rundsk/js-sdk",
-  "version": "1.3.0",
+  "version": "0.0.0",
   "description": "DSK: JavaScript SDK",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "build/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rundsk/js-sdk.git"
@@ -26,6 +23,14 @@
   },
   "homepage": "https://github.com/rundsk/js-sdk",
   "devDependencies": {
+    "@yarnpkg/esbuild-plugin-pnp": "^1.0.1-rc.1",
+    "babel-eslint": "^10.1.0",
+    "browserslist": "^4.16.8",
+    "esbuild": "^0.12.21",
+    "eslint": "^7.32.0",
+    "eslint-import-resolver-node": "^0.3.6",
+    "eslint-plugin-notice": "^0.9.10",
+    "eslint-plugin-prettier": "^3.4.0",
     "prettier": "^1.18.2"
   }
 }
