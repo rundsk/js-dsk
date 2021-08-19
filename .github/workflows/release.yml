@@ -15,13 +15,13 @@ jobs:
     name: Publish to NPM Registry
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - run: |
           export VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,' | sed -e 's/^v//')
           jq --arg v "$VERSION" '.version="$v"' package.json > tmp && mv tmp package.json  
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: '16'
           registry-url: https://registry.npmjs.org/
       - run: yarn
       - run: make build
