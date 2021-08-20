@@ -68,6 +68,19 @@ export default class Client {
     return this.fetch(`/api/v2/tree/${this.url(url)}?${params.toString()}`);
   }
 
+  // Returns a promise that resolve with the URL to a playground's index.html,
+  // which can be used as the source for an iframe.
+  static playgroundURL(node, doc, component, version = null) {
+    let params = new URLSearchParams();
+    if (version) {
+      params.set('v', version);
+    }
+
+    return Promise.resolve(
+      `/api/v2/tree/${this.url(node)}/_docs/${doc}/_playgrounds/${component}/index.html?${params.toString()}`
+    );
+  }
+
   // Will automatically strip leading and trailing slashes from the given
   // URL to turn it into a valid (node) URL for lookup.
   static url(url) {
