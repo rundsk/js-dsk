@@ -17,18 +17,15 @@ let cancelFilter = null;
 
 export default class Client {
   static hello() {
-    let [promise] = this.fetch('/api/v2/hello');
-    return promise;
+    return this.fetch('/api/v2/hello');
   }
 
   static config() {
-    let [promise] = this.fetch('/api/v2/config');
-    return promise;
+    return this.fetch('/api/v2/config');
   }
 
   static sources() {
-    let [promise] = this.fetch('/api/v2/sources');
-    return promise;
+    return this.fetch('/api/v2/sources');
   }
 
   // Returns a WebSocket connection to the messages endpoint. Asummes it
@@ -47,8 +44,7 @@ export default class Client {
       params.set('v', version);
     }
 
-    let [promise] = this.fetch(`/api/v2/tree?${params.toString()}`);
-    return promise;
+    return this.fetch(`/api/v2/tree?${params.toString()}`);
   }
 
   // Check if a node is present. Returns a promise that resolves to a boolean
@@ -59,7 +55,7 @@ export default class Client {
       params.set('v', version);
     }
 
-    return this.ping(`/api/v2/tree/${this.nodeURL(url)}?${params.toString()}`);
+    return this.ping(`/api/v2/tree/${this.url(url)}?${params.toString()}`);
   }
 
   // Returns node for given relative URL path.
@@ -69,17 +65,16 @@ export default class Client {
       params.set('v', version);
     }
 
-    let [promise] = this.fetch(`/api/v2/tree/${this.nodeURL(url)}?${params.toString()}`);
-    return promise;
+    return this.fetch(`/api/v2/tree/${this.url(url)}?${params.toString()}`);
   }
 
-  // Will automatically strip leading and trailing slashes from the given node
-  // URL to turn it into a valid node URL for lookup.
-  static nodeURL(url) {
-    if (url.charAt(0) === '/') {
+  // Will automatically strip leading and trailing slashes from the given
+  // URL to turn it into a valid (node) URL for lookup.
+  static url(url) {
+    if (url?.charAt(0) === '/') {
       url = url.substring(1);
     }
-    if (url.charAt(url.length - 1) === '/') {
+    if (url?.charAt(url.length - 1) === '/') {
       url = url.slice(0, -1);
     }
     return url;
@@ -98,7 +93,7 @@ export default class Client {
       cancelSearch();
     }
 
-    let [promise, cancel] = this.fetch(`/api/v2/search?${params.toString()}`);
+    let [promise, cancel] = this.fetchWithCancellation(`/api/v2/search?${params.toString()}`);
     cancelSearch = cancel;
     return promise;
   }
@@ -126,7 +121,7 @@ export default class Client {
       cancelFilter();
     }
 
-    let [promise, cancel] = this.fetch(`/api/v2/filter?${params.toString()}`);
+    let [promise, cancel] = this.fetchWithCancellation(`/api/v2/filter?${params.toString()}`);
     cancelFilter = cancel;
 
     return promise;
@@ -137,6 +132,16 @@ export default class Client {
   // indicating an error. Using plain XHR for better browser support and easier
   // basic auth handling.
   static fetch(url, type = 'json') {
+    let [promise] = this.fetchWithCancellation(url, type);
+    return promise;
+  }
+
+  // Advanced version of Client.fetch which supports cancellation.
+  static fetchWithCancellation(url, type = 'json') {
+    return this._fetch(url, type);
+  }
+
+  static _fetch(url, type = 'json') {
     let cancel;
     let promise = new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest();
@@ -169,7 +174,7 @@ export default class Client {
           resolve(xhr.response);
         }
       });
-      xhr.addEventListener('error', ev => {
+      xhr.addEventListener('error', (ev) => {
         reject(new Error(`Fetching '${url}' failed :-S: ${ev}`));
       });
       xhr.open('GET', url);
@@ -197,7 +202,7 @@ export default class Client {
           }
         }
       });
-      xhr.addEventListener('error', ev => {
+      xhr.addEventListener('error', (ev) => {
         reject(new Error(`Pinging '${url}' failed :-S: ${ev}`));
       });
       xhr.open('HEAD', url);
