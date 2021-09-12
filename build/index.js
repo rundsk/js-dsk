@@ -38,6 +38,13 @@ var Client = class {
     }
     return this.fetch(`/api/v2/tree/${this.url(url)}?${params.toString()}`);
   }
+  static playgroundURL(node, doc, component, version = null) {
+    let params = new URLSearchParams();
+    if (version) {
+      params.set("v", version);
+    }
+    return Promise.resolve(`/api/v2/tree/${this.url(node)}/_docs/${doc}/_playgrounds/${component}/index.html?${params.toString()}`);
+  }
   static url(url) {
     if (url?.charAt(0) === "/") {
       url = url.substring(1);
