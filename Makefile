@@ -6,7 +6,6 @@
 
 NODE_ENV ?= production
 MINIFY ?= n
-VERSION ?= $(shell head -n1 VERSION.txt)
 
 ALL_SOURCE = $(shell find . -type d \( -name build -or -name dist \) -prune -or -type f -print)
 
@@ -17,11 +16,11 @@ dev:
 .PHONY: test
 test:
 
-.PHONY: build
-build: build/index.js
-
 build/index.js: $(ALL_SOURCE)
 	MINIFY=$(MINIFY) yarn node esbuild.js
+
+.PHONY: build
+build: build/index.js
 
 .PHONY: dist
 dist:
