@@ -34,8 +34,10 @@ export default class DocTransformer {
   //     }
   //   });
   //   ```
-  constructor(html, transforms = {}, orphans = [], options = {}) {
+  constructor(html, components = [], transforms = {}, orphans = [], options = {}) {
     this.html = html;
+
+    this.components = components;
 
     // Turn all the keys of our transforms into lowercase, because that’s how
     // HTML is parsed.
@@ -62,10 +64,29 @@ export default class DocTransformer {
   compile() {
     let start = performance.now();
 
+    let html = this.html;
+
+    // We want to make sure the content of preformatted components does not get parsed into
+    // html nodes, so we remove the content before parsing and insert it as textContent
+    // into the node for the component after parsing.
+    this.components.forEach((c, i) => {
+      if (this.options.isPreformatted(c.name.toLowerCase())) {
+        // This works even if multiple components have the same rawInner, since components
+        // is ordered by occurence and .replace always replaces the first occurence.
+        html = html.replace(c.rawInner, `<span data-id="component-${i}-content-placeholder"></span>`);
+      }
+    })
+
     // Use the browsers machinery to parse HTML and allow us to iterate
     // over it easily. Later child nodes are unwrapped from body again.
     let body = document.createElement('body');
-    body.innerHTML = this.html;
+    body.innerHTML = html;
+
+    this.components.forEach((c, i) => {
+      if (this.options.isPreformatted(c.name.toLowerCase())) {
+        body.querySelector(`[data-id="component-${i}-content-placeholder"]`).parentElement.textContent = c.rawInner;
+      }
+    })
 
     body.innerHTML = this.orphan(body);
     this.clean(body);
@@ -174,6 +195,6 @@ export default class DocTransformer {
   }
 }
 
-export function transform(html, transforms = {}, orphans = [], options = {}) {
-  return new DocTransformer(html, transforms, orphans, options).compile();
+export function transform(html, components = [], transforms = {}, orphans = [], options = {}) {
+  return new DocTransformer(html, components, transforms, orphans, options).compile();
 }

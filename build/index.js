@@ -1,4 +1,4 @@
-// pnp:/Users/mariuswilms/Code/dsk/js-sdk/src/Client.js
+// pnp:/Users/christoph.labacher/Documents/DSK-new/js-sdk/src/Client.js
 var cancelSearch = null;
 var cancelFilter = null;
 var Client = class {
@@ -145,10 +145,11 @@ var Client = class {
   }
 };
 
-// pnp:/Users/mariuswilms/Code/dsk/js-sdk/src/Doc.js
+// pnp:/Users/christoph.labacher/Documents/DSK-new/js-sdk/src/Doc.js
 var DocTransformer = class {
-  constructor(html, transforms = {}, orphans = [], options = {}) {
+  constructor(html, components = [], transforms = {}, orphans = [], options = {}) {
     this.html = html;
+    this.components = components;
     this.transforms = {};
     let key;
     let keys = Object.keys(transforms);
@@ -166,8 +167,20 @@ var DocTransformer = class {
   }
   compile() {
     let start = performance.now();
+    let html = this.html;
+    this.components.forEach((c, i) => {
+      if (this.options.isPreformatted(c.name.toLowerCase())) {
+        html = html.replace(c.rawInner, `<span data-id="component-${i}-content-placeholder"></span>`);
+      }
+    });
     let body = document.createElement("body");
-    body.innerHTML = this.html;
+    body.innerHTML = html;
+    console.log(body);
+    this.components.forEach((c, i) => {
+      if (this.options.isPreformatted(c.name.toLowerCase())) {
+        body.querySelector(`[data-id="component-${i}-content-placeholder"]`).parentElement.textContent = c.rawInner;
+      }
+    });
     body.innerHTML = this.orphan(body);
     this.clean(body);
     let children = [];
@@ -236,11 +249,11 @@ var DocTransformer = class {
     return apply(props);
   }
 };
-function transform(html, transforms = {}, orphans = [], options = {}) {
-  return new DocTransformer(html, transforms, orphans, options).compile();
+function transform(html, transforms = {}, components, orphans = [], options = {}) {
+  return new DocTransformer(html, transforms, components, orphans, options).compile();
 }
 
-// pnp:/Users/mariuswilms/Code/dsk/js-sdk/src/Tree.js
+// pnp:/Users/christoph.labacher/Documents/DSK-new/js-sdk/src/Tree.js
 var Tree = class {
   constructor(root) {
     this.root = root;
